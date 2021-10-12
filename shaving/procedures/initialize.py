@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..tree.nodes import JobNode
+from ..tree.nodes import JobNode, NullJobNode
 from ..tree.balanced_tree import BalancedJobTree
 
 
