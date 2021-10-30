@@ -4,7 +4,7 @@ from ..tree.balanced_tree import BalancedJobTree
 
 
 def initialize_sigma_and_xi(job_tree: BalancedJobTree) -> None:
-    """Calculate initial value of each job's sigma and xi in balanced binary tree. 
+    """Calculate initial value of each job's sigma and xi in balanced binary tree.
 
     Args:
         job_tree (BalancedJobTree):
