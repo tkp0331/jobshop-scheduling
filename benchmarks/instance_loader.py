@@ -6,6 +6,9 @@ import os
 import sys
 from typing import Any, Dict, List, NewType, Optional
 
+from .jsp import Operation, Job, JSP
+
+
 JobName = NewType('JobName', str)
 
 HOMEDIR = os.path.dirname(__file__)
@@ -43,18 +46,19 @@ class JSPMetaData(object):
     def parse_instancefile(self) -> JSPInstance:
         """Parse instance file and create 'JSPInstance' instance
         """
+        jsp = JSP()
+
         abspath = os.path.join(HOMEDIR, self.instance_path)
         with open(abspath) as instance_file:
             # skip first line
             instance_file.readline()
 
-            seq_of_machines = {f"job{i}": list() for i in range(self.n_jobs)}
-            processing_times = {f"job{i}": list() for i in range(self.n_jobs)}
             for job_idx, line in enumerate(instance_file):
                 if not line:
                     # last line of instance file
                     break
 
+                job = Job(name=f"job{job_idx}")
                 elements = line.strip().split()
                 try:
                     elements = [int(element) for element in elements]
@@ -63,17 +67,20 @@ class JSPMetaData(object):
 
                 for i in range(0, 2 * self.n_machines, 2):
                     machine_idx, processing_time = elements[i], elements[i + 1]
-                    seq_of_machines[f"job{job_idx}"].append(machine_idx)
-                    processing_times[f"job{job_idx}"].append(processing_time)
+                    job.append(Operation(
+                        processed_by=machine_idx,
+                        p=processing_time,
+                        name=f"O_{job_idx}{i//2}"
+                    ))
+                jsp.append(job)
 
-        return JSPInstance(seq_of_machines, processing_times, meta_data=self)
+        return JSPInstance(jsp=jsp, meta_data=self)
 
 
 @dataclasses.dataclass
 class JSPInstance(object):
     """JSP Instance class"""
-    seq_of_machines: Dict[JobName, List[int]]
-    processing_times: Dict[JobName, List[int]]
+    jsp: JSP
     meta_data: JSPMetaData
 
     def __str__(self):
